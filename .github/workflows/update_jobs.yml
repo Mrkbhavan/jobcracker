@@ -1,0 +1,35 @@
+name: JobCracker Auto Update (8 AM & 8 PM IST)
+
+on:
+  schedule:
+    - cron: '30 2 * * *'  # 08:00 AM IST in UTC
+    - cron: '30 14 * * *' # 08:00 PM IST in UTC
+  workflow_dispatch:
+
+jobs:
+  scrape_and_update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run Scraper & Cleaner
+        run: python scraper.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "JobCracker Bot"
+          git config --global user.email "bot@jobcracker.com"
+          git add jobs.json archive.json
+          git commit -m "Auto-updated latest Govt Jobs" |
+
+| exit 0
+          git push
